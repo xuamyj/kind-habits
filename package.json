@@ -3,6 +3,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.31.0",
     "@types/node": "^20.4.5"
   }
 }
