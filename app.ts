@@ -3,8 +3,14 @@
 import { readFileSync } from 'fs';
 import * as http from 'http'; 
 
+import { createClient } from '@supabase/supabase-js'
+
 const hostname = '127.0.0.1';
 const port = 3000;
+
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 const server = http.createServer((req, res) => {
   if (req.url === "/") {  
@@ -36,7 +42,7 @@ const server = http.createServer((req, res) => {
   // login: POST
   // logout: POST
 
-  } else if (req.url === "/other") { 
+  } else if (req.url === "/test") { 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
     res.end('Hello World');
