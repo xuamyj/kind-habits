@@ -10,9 +10,10 @@ const app = express()
 const hostname = '127.0.0.1';
 const port = 3000;
 
-// const supabaseUrl = process.env.SUPABASE_URL
-// const supabaseKey = process.env.SUPABASE_KEY
-// const supabase = createClient(supabaseUrl, supabaseKey)
+require("dotenv").config();
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 app.get('/', (req, res) => {
   const html = readFileSync('index.html'); 
@@ -21,9 +22,16 @@ app.get('/', (req, res) => {
 })
 
 // view all boards for [user]: GET
-app.get('/view_boards/:userId', (req, res) => {
+app.get('/view_boards/:userId', async (req, res) => {
   const userId = req.params.userId;
-  // Then you can use userId... 
+  // Query the "public.boards" table
+  const { data: boards, error } = await supabase.from('boards').select('*');
+
+  if (error) {
+    console.error(error)
+  } else {
+    console.log(`Boards: ${boards}`)
+  }
   res.send(`View all boards for ${userId}!`);
 })
   
