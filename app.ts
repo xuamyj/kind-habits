@@ -6,7 +6,9 @@ import express from 'express';
 
 import { createClient } from '@supabase/supabase-js'
 
-const app = express()
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -32,10 +34,30 @@ app.get('/view_boards/:userId', async (req, res) => {
   } else {
     console.log(`Boards: ${boards}`)
   }
-  res.send(`View all boards for ${userId}!`);
+  // res.send(`View all boards for ${userId}!`);
+
+  const html = readFileSync('test-html/create_board.html'); 
+  res.set('Content-Type', 'text/html');
+  res.send(html);
 })
   
-  // create new [board] for [user]: POST
+// create new [board] for [user]: POST
+// app.post('/create_board/:userId', async (req, res) => {
+//   const userId = req.params.userId;
+  
+app.post('/create_board', async (req, res) => {
+  const board_name = req.body.board_name;
+  const board_description = req.body.board_description;
+  const board_color = req.body.board_color;
+  
+  console.log("\n\nHI");
+  // console.log(`userId: ${userId}`); 
+  console.log(`board_name: ${board_name}`); 
+  console.log(`board_description: ${board_description}`); 
+  console.log(`board_color: ${board_color}`); 
+
+  res.send(`Finish!`);
+})
 
 // view board info for [board]: GET
 app.get('/view_board_info/:boardId', (req, res) => {
