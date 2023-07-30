@@ -17,6 +17,8 @@ const supabaseUrl = process.env.SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+const testUserId = process.env.TEST_USER_ID
+
 app.get('/', (req, res) => {
   const html = readFileSync('index.html'); 
   res.set('Content-Type', 'text/html');
@@ -27,12 +29,12 @@ app.get('/', (req, res) => {
 app.get('/view_boards/:userId', async (req, res) => {
   const userId = req.params.userId;
   // Query the "public.boards" table
-  const { data: boards, error } = await supabase.from('boards').select('*');
+  const { data: boards, error } = await supabase.from('boards').select('*').eq('user_id', userId);
 
   if (error) {
     console.error(error)
   } else {
-    console.log(`Boards: ${boards}`)
+    console.log(`\nBoards: ${boards}`)
   }
   // res.send(`View all boards for ${userId}!`);
 
@@ -50,11 +52,28 @@ app.post('/create_board', async (req, res) => {
   const board_description = req.body.board_description;
   const board_color = req.body.board_color;
   
-  console.log("\n\nHI");
+  console.log("\nHI");
   // console.log(`userId: ${userId}`); 
   console.log(`board_name: ${board_name}`); 
   console.log(`board_description: ${board_description}`); 
   console.log(`board_color: ${board_color}`); 
+
+  // Define the new row data
+  const newRowData = {
+    board_name: board_name,
+    board_description: board_description,
+    board_color: board_color,
+    user_id: testUserId,
+  }
+
+  // Insert the new row into the "public.boards" table
+  const { data, error } = await supabase.from('boards').insert(newRowData)
+
+  if (error) {
+    console.error(error)
+  } else {
+    console.log(`Data: ${data}`)
+  }
 
   res.send(`Finish!`);
 })
