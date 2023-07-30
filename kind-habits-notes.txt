@@ -1,0 +1,12 @@
+node.js (nvm, npm) - only need once
++ express - node just lets you run JS on computer, express needed for routing
+
+typescript - need in every project, but next.js will install for you
+
+github repo etc
+
+supabase
++ dotenv - if doing next.js/supabase, just follow their .env.local
+
+[html]
++ express-handlebars - for templating
