@@ -1,0 +1,16 @@
+<h2>
+    Kind habits: Delete board for {{boardId}}
+</h2>
+
+<p>
+    Are you sure you want to delete Board {{board.id}}?
+</p>
+<ul>
+    <li>Board name: {{board.board_name}}</li>
+    <li>Board description: {{board.board_description}}</li>
+    <li>Board color: {{board.board_color}}</li>
+</ul>
+
+<form action="/delete_board/{{boardId}}" method="post"> 
+    <input type="submit" value="Yes, delete it">
+</form>

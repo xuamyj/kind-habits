@@ -1,0 +1,25 @@
+<h2>
+    Kind habits: View boards for {{userId}}
+</h2>
+
+<h3>All boards: </h3>
+{{#each boards}}
+    <p>
+        Board {{id}} 
+        <a href="/view_board_info/{{id}}">
+            (View board info)
+        </a>
+        <a href="/view_curr_month/{{id}}">
+            (View board days)
+        </a>
+    </p>
+    <ul>
+        <li>Board name: {{board_name}}</li>
+        <li>Board description: {{board_description}}</li>
+        <li>Board color: {{board_color}}</li>
+    </ul>
+{{/each}}
+
+<a href="/create_board/{{userId}}">
+    Create new board for {{userId}}
+</a>

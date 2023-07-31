@@ -1,0 +1,23 @@
+<h2>
+    Kind habits: View board info for {{boardId}}
+</h2>
+
+<p>
+    Board {{board.id}} 
+</p>
+<ul>
+    <li>Board name: {{board.board_name}}</li>
+    <li>Board description: {{board.board_description}}</li>
+    <li>Board color: {{board.board_color}}</li>
+</ul>
+
+<p>
+    <a href="/edit_board_info/{{boardId}}">
+        Edit board info for {{boardId}}
+    </a>
+</p>
+<p>
+    <a href="/delete_board/{{boardId}}">
+        Delete board for {{boardId}}
+    </a>
+</p>

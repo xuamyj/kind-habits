@@ -3,12 +3,16 @@
 import { readFileSync } from 'fs';
 import * as http from 'http'; 
 import express from 'express';
+import { engine } from 'express-handlebars';
 
 import { createClient } from '@supabase/supabase-js'
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', './views');
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -18,14 +22,14 @@ const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const testUserId = process.env.TEST_USER_ID
+const emptyUserId = process.env.EMPTY_USER_ID
+
 
 // -------------------------------
-// HOME: GET
+// Home: GET
 // -------------------------------
 app.get('/', (req, res) => {
-  const html = readFileSync('index.html'); 
-  res.set('Content-Type', 'text/html');
-  res.send(html);
+  res.render('home', { testUserId: testUserId, emptyUserId: emptyUserId });
 })
 
 // -------------------------------
@@ -47,24 +51,19 @@ app.get('/view_boards/:userId', async (req, res) => {
     console.log("]")
   }
 
-  const html = readFileSync('test-html/view_boards.html'); 
-  res.set('Content-Type', 'text/html');
-  res.send(html);
+  res.render('view_boards', { userId: userId, boards: boards });
 })
 
 // -------------------------------
 // create new [board] for [user]: POST
 // -------------------------------
-app.get('/create_board', (req, res) => {
-  const html = readFileSync('test-html/create_board_FORM.html'); 
-  res.set('Content-Type', 'text/html');
-  res.send(html);
+app.get('/create_board/:userId', (req, res) => {
+  const userId = req.params.userId;
+
+  res.render('create_board_FORM', { userId: userId });
 })
-// app.post('/create_board/:userId', async (req, res) => {
-//   const userId = req.params.userId;
-  
-app.post('/create_board', async (req, res) => {
-  const userId = testUserId;
+app.post('/create_board/:userId', async (req, res) => {
+  const userId = req.params.userId;
 
   const board_name = req.body.board_name;
   const board_description = req.body.board_description;
@@ -88,11 +87,8 @@ app.post('/create_board', async (req, res) => {
 
   if (error) {
     console.error(error)
-  } else {
-    console.log(`Success: ${data}`)
   }
-
-  res.send(`Finish!`);
+  res.send(`Finish create board!`);
 })
 
 // -------------------------------
@@ -108,6 +104,7 @@ app.get('/view_board_info/:boardId', async (req, res) => {
     console.error(error)
   } else if (boards.length === 0){
     console.log(`\nBoard ${boardId} does not exist!`); 
+    res.render('id_not_found', { id: boardId });
   } else {    
     const board = boards[0];
 
@@ -115,22 +112,88 @@ app.get('/view_board_info/:boardId', async (req, res) => {
     console.log(`Board name: ${board.board_name}`);
     console.log(`Board description: ${board.board_description}`);
     console.log(`Board color: ${board.board_color}`);
+    res.render('view_board_info', { boardId: boardId, board: board });
   }
-
-  const html = readFileSync('test-html/view_board_info.html'); 
-  res.set('Content-Type', 'text/html');
-  res.send(html);
 })
 
 // -------------------------------
 // edit board info for [board]: POST - check board exists?
 // -------------------------------
+app.get('/edit_board_info/:boardId', async (req, res) => {
+  const boardId = req.params.boardId;
+  
+  // Query the "public.boards" table
+  const { data: boards, error } = await supabase.from('boards').select('*').eq('id', boardId);
 
+  if (error) {
+    console.error(error)
+  } else if (boards.length === 0){
+    console.log(`\nBoard ${boardId} does not exist!`); 
+    res.render('id_not_found', { id: boardId });
+  } else {    
+    const board = boards[0];
+    res.render('edit_board_info_FORM', { boardId: boardId, board: board });
+  }
+})
+app.post('/edit_board_info/:boardId', async (req, res) => {
+  const boardId = req.params.boardId;
+
+  // Should POST also check if board exists? TODO
+  const input_name = req.body.board_name;
+  const input_description = req.body.board_description;
+  const input_color = req.body.board_color;
+
+  console.log("\nCreating board:");
+  console.log(`input_name: ${input_name}`); 
+  console.log(`input_description: ${input_description}`); 
+  console.log(`input_color: ${input_color}`); 
+
+  const { data: boards, error } = await supabase
+  .from('boards')
+  .update({ board_name: input_name, board_description: input_description, board_color: input_color})
+  .eq('id', boardId);
+  
+  if (error) {
+    console.error(error)
+  }
+  res.send(`Finish edit board info!`);
+})
 
 // -------------------------------
 // delete board for [board]: POST - check board exists? 
 // -------------------------------
+app.get('/delete_board/:boardId', async (req, res) => {
+  const boardId = req.params.boardId;
+  
+  // Query the "public.boards" table
+  const { data: boards, error } = await supabase.from('boards').select('*').eq('id', boardId);
 
+  if (error) {
+    console.error(error)
+  } else if (boards.length === 0){
+    console.log(`\nBoard ${boardId} does not exist!`); 
+    res.render('id_not_found', { id: boardId });
+  } else {    
+    const board = boards[0];
+    res.render('delete_board_FORM', { boardId: boardId, board: board });
+  }
+})
+app.post('/delete_board/:boardId', async (req, res) => {
+  const boardId = req.params.boardId;
+
+  // Should POST also check if board exists? TODO
+  console.log(`\nDeleting board: ${boardId}`);
+
+  const { data: deletedBoard, error } = await supabase
+  .from('boards')
+  .delete()
+  .eq('id', boardId);
+  
+  if (error) {
+    console.error(error)
+  }
+  res.send(`Finish delete board!`);
+})
 
 // -------------------------------
 // view current month of days on [board]: GET
