@@ -1,0 +1,23 @@
+<h2>
+    Kind habits: Add today ({{yearMonthDay}}) for {{boardId}} ({{board.board_name}})
+</h2>
+
+<form action="/add_today/{{boardId}}" method="post"> 
+    <input type="hidden" name="year_month_day" value="{{yearMonthDay}}">
+    <label for="done">Done today?</label><br>
+    <input type="checkbox" name="done_today" value="true"> 
+    <br><br>
+    <label for="color">Color if not done:</label>
+    <!-- https://coolors.co/f08080-ffa07a-f0e68c-87ceeb-afeeee-66cdaa-90ee90-d8bfd8 -->
+    <select id="color" name="color_not_done" required>
+        <option value="FFFFFF">Default (White)</option>
+        <option value="F08080">LightCoral (Red)</option>
+        <option value="FFA07A">LightSalmon (Orange)</option>
+        <option value="F0E68C">Khaki (Yellow)</option>
+    </select>
+    <br><br>
+    <label for="notes">Board notes:</label>
+    <input type="text" id="notes" name="day_notes">
+    <br><br>
+    <input type="submit"> 
+</form>
